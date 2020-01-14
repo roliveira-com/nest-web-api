@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/styles.min.css">
+    <title>{{ title }}</title>
+</head>
+
+<body>
+    {{#*inline "navbar"}}
+
+    {{/inline}}
+
+    <section class="hero is-primary">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    {{ title }}
+                </h1>
+                <h2 class="subtitle">
+                    {{ subtitle }}
+                </h2>
+            </div>
+        </div>
+    </section>
+    <br>
+    <div class="container">
+        <div id="notification" class="notification is-warning"></div>
+        <div class="content is-medium">
+            <h1>Nest Playgound</h1>
+            <ul>
+                {{#each chat}}
+                <li>{{this.person}}</li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+    <script src="/js/notifications.js"></script>
+</body>
+
+</html>
