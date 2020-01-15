@@ -1,4 +1,4 @@
-import { Injectable, Req, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { User, UserAuth } from './model/user.interface';
 import { HttpAppResponse } from './model/response.interface';
@@ -14,7 +14,7 @@ export class AppService {
     return this.usersList;
   }
 
-  subscribeNotifications(@Req() request, @Res() response){
+  subscribeNotifications(request, response){
     const client = {
       id: Date.now(),
       res: response
@@ -58,7 +58,7 @@ export class AppService {
     }
   }
 
-  loginAdmin(@Req() auth: UserAuth, @Res() response): HttpAppResponse {
+  loginAdmin(auth: UserAuth, response): HttpAppResponse {
     if(auth.login === 'admin' && auth.pass === '1234ceara') {
       return response.status(201).send({
         code: 200,
