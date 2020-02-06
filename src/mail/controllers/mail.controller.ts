@@ -7,7 +7,9 @@ export class MailController {
 
   @Get("parser")
   parseMail() {
-    this.mail.connect();
-    return { status: "OK" };
+    return { 
+      status: "OK",
+      response: this.mail.connect()
+    };
   }
 }
