@@ -6,10 +6,7 @@ export class MailController {
   constructor(private mail: EmailConnectService) {}
 
   @Get("parser")
-  parseMail() {
-    return { 
-      status: "OK",
-      response: this.mail.connect()
-    };
+  async parseMail(): Promise<any> {
+    return this.mail.retrieveTheMessages();
   }
 }
