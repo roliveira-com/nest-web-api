@@ -1,16 +1,24 @@
 import { Injectable } from "@nestjs/common";
 import * as Imap from "imap";
 import * as Util from "util";
-import { simpleParser } from "mailparser";
+import { simpleParser, MailParser } from "mailparser";
+
+const EmailParser = new MailParser()
 
 const Email = new Imap({
   user: "ro@roliveira.com",
-  password: "roliveira05",
+  password: "",
   host: "imap.umbler.com",
   port: 993,
   tls: true,
   tlsOptions: { secureProtocol: "TLSv1_method" }
 });
+
+let mailobj = {
+  attachments: [],
+  text: {},
+  headers: null
+};
 
 @Injectable()
 export class EmailConnectService {
@@ -82,19 +90,32 @@ export class EmailConnectService {
             });
             emailFetch.on("message", function(msg, seq) {
               msg.on("body", function(stream, info) {
+                let buffer = []
+
+                // EmailParser.once('data', data => {
+                //   // console.log(data.textAsHtml)
+                //   buffer.push({ message: data.textAsHtml })
+                //   // resolve({ status: "OK", result: data.textAsHtml });
+                // });    
+                
+                // EmailParser.on("end", () => {
+                //   resolve({result:buffer})
+                // })
+
+                // stream.pipe(EmailParser);
                 // var buffer = "";
                 // stream.on("data", function(chunk) {
                 //   buffer += chunk.toString("utf8");
                 //   emailResult.push(chunk.toString("utf8"));
                 //   simpleParser(chunk, function() {
-                //     emailResult.push(chunk.toString("utf8"));
+                //     emailResult.push({ content: chunk.toString("utf8") });
                 //   });
                 // });
                 // stream.on("end", function() {
                 //   emailResult.push(buffer);
                 // });
-                simpleParser(stream, function(err, mail) {
-                  emailResult.push(mail);
+                simpleParser(stream, {  }, function(err, mail) {
+                  emailResult.push({ content: mail.textAsHtml });
                 });
                 // simpleParser(stream)
                 //   .then(email => {
@@ -109,17 +130,17 @@ export class EmailConnectService {
                 //   });
               });
               msg.once("attributes", function(attrs) {
-                console.log("Attributes: %s", Util.inspect(attrs, false, 8));
+                //console.log("Attributes: %s", Util.inspect(attrs, false, 8));
               });
               msg.once("end", function() {
-                console.log("Finished");
+                //console.log("Finished");
               });
             });
             emailFetch.once("error", function(err) {
               console.log("Fetch error: " + err);
             });
             emailFetch.once("end", function() {
-              resolve({ status: "OK", result: emailResult });
+              resolve({ status: "OK", result: JSON.stringify(emailResult) });
               console.log("Done fetching all messages!");
               Email.end();
             });
