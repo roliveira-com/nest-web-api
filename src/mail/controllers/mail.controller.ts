@@ -7,6 +7,6 @@ export class MailController {
 
   @Get("parser")
   async parseMail(): Promise<any> {
-    return this.mail.retrieveTheMessages();
+    return this.mail.searchMessagesByAddressAndDate();
   }
 }
