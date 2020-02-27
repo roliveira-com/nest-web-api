@@ -4,7 +4,7 @@ import * as Util from "util";
 import { imap } from '../../configs/email.config';
 import { simpleParser } from "mailparser";
 
-const Email = new Imap(imap.umbler);
+const Email = new Imap(imap.gmail);
 
 @Injectable()
 export class EmailConnectService {
@@ -16,8 +16,8 @@ export class EmailConnectService {
         Email.openBox("INBOX", true, (err, box) => {
           if (err) reject(err);
           Email.search(["ALL", 
-            ["FROM", "rodrigo.olive@gmail.com"], 
-            ['SINCE', 'January 01, 2020']], 
+            ["FROM", "noreply@medium.com"], 
+            ['SINCE', 'February 01, 2020']], 
           (err, messages) => {
             if (err) reject(err);
 

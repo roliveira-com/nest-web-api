@@ -12,6 +12,7 @@ export const imap = {
     password: "",
     host: "imap.gmail.com",
     port: 993,
-    tls: true
+    tls: true,
+    tlsOptions: { secureProtocol: "TLSv1_method" }
   }
 }
