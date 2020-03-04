@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import * as Imap from "imap";
+import Imap from "imap";
 import * as Util from "util";
 import { imap } from '../../configs/email.config';
 import { simpleParser } from "mailparser";
@@ -17,7 +17,7 @@ export class EmailConnectService {
           if (err) reject(err);
           Email.search(["ALL", 
             ["FROM", "noreply@medium.com"], 
-            ['SINCE', 'February 01, 2020']], 
+            ['SINCE', 'February 29, 2020']], 
           (err, messages) => {
             if (err) reject(err);
 
