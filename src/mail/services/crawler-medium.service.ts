@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import cheerio from 'cheerio'
+import cheerio from 'cheerio';
 
 @Injectable()
 export class CrawlerMediumService {
@@ -11,8 +11,9 @@ export class CrawlerMediumService {
       prospects = [
         ...prospects,
         { 
-          mailId: Buffer.from(`${Date.now()}`).toString('base64'),
-          mailContent: this.getArticleList(message.email)
+          date: message.date,
+          subject: message.subject,
+          content: this.getArticleList(message.email)
         }
       ]
     })
@@ -39,6 +40,56 @@ export class CrawlerMediumService {
     return subtitleElement.text().replace(/\s+/g, ' ');
   }
 
+  private getPublicator(element){
+    const $ = cheerio.load(element);
+
+    let publicatorElement = $('table tr div.email-marginTop8 a').next();
+    if (!publicatorElement.text()){
+      publicatorElement = $('table div.email-marginTop12 a').next();
+    }
+
+    let pageLink = publicatorElement.attr('href') || null;
+    if(pageLink){
+      pageLink = pageLink.match(/(https?:\/\/[^ ?]*)/g)[0]
+    }
+
+    let publicatorId = pageLink || null;
+    if (publicatorId){
+      publicatorId = publicatorId.replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '')
+    }
+
+    return {
+      publicatorId,
+      name: publicatorElement.text() || null,
+      pageLink: pageLink
+    }
+  }
+
+  private getAuthor(element: CheerioElement) {
+    const $ = cheerio.load(element);
+
+    let authorElement = $('table tr div.email-marginTop8 a');
+    if (!authorElement.text()) {
+      authorElement = $('table div.email-marginTop12 a');
+    }
+
+    let pageLink = authorElement.attr('href') || null;
+    if (pageLink) {
+      pageLink = pageLink.match(/(https?:\/\/[^ ?]*)/g)[0]
+    }
+
+    let authorId = pageLink || null;
+    if (authorId) {
+      authorId = authorId.replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '')
+    }
+
+    return {
+      authorId,
+      name: authorElement.first().text(),
+      pageLink: pageLink
+    }
+  }
+
   private getElementsList(html: string): Array<CheerioElement> {
     const $ = cheerio.load(html);
 
@@ -60,15 +111,19 @@ export class CrawlerMediumService {
 
       const featured = $('table td').next().find($('div.email-digestPostTitle a')).text() ? false : true;
 
-      const articleThumb = $('td a div').attr('style').match(/(https?:\/\/[^ )]*)/)[0];;
+      const thumb = $('td a div').attr('style').match(/(https?:\/\/[^ )]*)/)[0];;
 
-      const articleLink = $('td a').attr('href').match(/(https?:\/\/[^ ?]*)/g)[0];
+      const link = $('td a').attr('href').match(/(https?:\/\/[^ ?]*)/g)[0];
 
-      const articleTitle = this.getArticleTitle(topic);
+      const title = this.getArticleTitle(topic);
 
-      const articleSubtitle = this.getArticleSubtitle(topic);
+      const publicator = this.getPublicator(topic);
 
-      const article = { featured, articleTitle, articleSubtitle, articleLink, articleThumb };
+      const author = this.getAuthor(topic);
+
+      const subtitle = this.getArticleSubtitle(topic);
+
+      const article = { featured, title, subtitle, link, thumb, publicator, author };
 
       articleList = [...articleList, article]
     })

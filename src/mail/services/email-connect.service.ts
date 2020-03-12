@@ -17,7 +17,7 @@ export class EmailConnectService {
           if (err) reject(err);
           Email.search(["ALL", 
             ["FROM", "noreply@medium.com"], 
-            ['SINCE', 'February 29, 2020']], 
+            ['SINCE', 'March 11, 2020']], 
           (err, messages) => {
             if (err) reject(err);
 
@@ -28,6 +28,7 @@ export class EmailConnectService {
                   if (errParser) reject(errParser);
                   if (mail && mail.from) {
                     this.emailResult.push({
+                      date: mail.date,
                       from: mail.from.value[0].address,
                       subject: mail.subject,
                       email: mail.html
