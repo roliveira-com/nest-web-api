@@ -16,10 +16,10 @@ export class EmailConnectService {
         Email.openBox("INBOX", true, (err, box) => {
           if (err) reject(err);
           Email.search(["ALL", 
-            ["FROM", "noreply@medium.com"], 
-            ['SINCE', 'March 11, 2020']], 
+            ["FROM", "rodrigo.olive@gmail.com"], 
+            ['SINCE', 'March 13, 2020']], 
           (err, messages) => {
-            if (err) reject(err);
+            if (err) reject(`Error On Search ${err}`);
 
             const Fetch = Email.fetch(messages, { bodies: '' });
             Fetch.on('message', (msg, seqno) => {
@@ -92,7 +92,7 @@ export class EmailConnectService {
 
       Email.on("error", (err) => {
         reject(err);
-        console.log("Error on Connection", err);
+        console.log("Error on Fetching", err);
       });
 
       Email.connect();

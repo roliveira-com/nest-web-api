@@ -1,0 +1,12 @@
+.card {
+  width: 250px;
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+.message-date {
+  display: inline-block;
+  margin-bottom: 1em;
+  font-size: .8em;
+  text-align: right;
+}

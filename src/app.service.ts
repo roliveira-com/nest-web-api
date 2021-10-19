@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 
 import { User, UserAuth } from './model/user.interface';
 import { HttpAppResponse } from './model/response.interface';
+import { Stream } from 'stream';
+import { StreamState } from 'http2';
+import { ServerResponse } from 'http';
 
 @Injectable()
 export class AppService {
   public usersList: User[] = [];
-  public notification = {};
+  public notification: any = {};
   public clients = []
  
 
@@ -14,9 +17,10 @@ export class AppService {
     return this.usersList;
   }
 
-  subscribeNotifications(request, response){
+  subscribeNotifications(request: Stream, response: ServerResponse, name: string = 'guest'){
     const client = {
       id: Date.now(),
+      name,
       res: response
     }
 
@@ -28,14 +32,35 @@ export class AppService {
     })
 
     response.write(`data: ${JSON.stringify(this.notification)}\n\n`)
-
   }
 
-  sendNotifications(message){
-    this.notification = { ...message };
-    this.clients.forEach(client => {
-      client.res.write(`data: ${JSON.stringify(this.notification)}\n\n`)
+  sendNotifications(message, targets = null): Promise<any>{
+    return new Promise((resolve, reject) => {
+      const channel = message.channel;
+  
+      this.notification = { 
+        ...message,
+        date: new Date().toLocaleString()
+      };
+  
+      if(channel){
+        targets = this.clients.filter(client => client.name === channel);
+        if(!targets) {
+          reject('O canal especificado não existe')
+        }
+      } else {
+        targets = this.clients;
+      }
+
+      targets.forEach(client => {
+        client.res.write(`data: ${JSON.stringify(this.notification)}\n\n`);
+      })
+
+      resolve({ message: `Mensagem enviada para o canal ${channel || 'guest'}` });
+
+      this.notification = null;
     })
+
   }
 
   addUser(user: User): HttpAppResponse {
